@@ -1,12 +1,13 @@
--- // M4 GUI v1 - c00lkidd inspired, with tabs, FPS, toggle, and organized structure
+-- // M4 GUI v1 - Inspired by c00lkidd | Organized Tabs, FPS Counter, Toggle System
 
--- [[ MAIN GUI SETUP ]]
-local plr = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", plr:WaitForChild("PlayerGui"))
+-- [[ SETUP ]]
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "M4_GUI"
 gui.ResetOnSpawn = false
 
--- [[ FRAME SETUP ]]
+-- [[ MAIN FRAME ]]
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 240, 0, 280)
 frame.Position = UDim2.new(0.5, -120, 0.5, -140)
@@ -15,13 +16,12 @@ frame.BorderColor3 = Color3.fromRGB(0, 162, 255)
 frame.BorderSizePixel = 2
 frame.Active = true
 frame.Draggable = true
-frame.Visible = true
 
 -- [[ TITLE BAR ]]
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, -50, 0, 30)
 title.Position = UDim2.new(0, 5, 0, 0)
-title.Text = "M4 GUI"
+title.Text = "Syk1vz Client"
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 22
 title.TextColor3 = Color3.fromRGB(0, 162, 255)
@@ -34,22 +34,23 @@ closeBtn.Position = UDim2.new(1, -45, 0, 3)
 closeBtn.Text = "X"
 closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.TextSize = 18
-closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
 closeBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
 closeBtn.BorderColor3 = Color3.fromRGB(0, 162, 255)
 
--- [[ TOGGLE BUTTON (BOTTOM RIGHT) ]]
+-- [[ TOGGLE BUTTON ]]
 local toggleBtn = Instance.new("TextButton", gui)
 toggleBtn.Size = UDim2.new(0, 80, 0, 30)
 toggleBtn.Position = UDim2.new(1, -90, 1, -40)
 toggleBtn.Text = "Open M4"
 toggleBtn.Font = Enum.Font.SourceSansBold
 toggleBtn.TextSize = 16
-toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
 toggleBtn.BorderColor3 = Color3.fromRGB(0, 162, 255)
+toggleBtn.Visible = false
 
--- Close / Open Logic
+-- [[ Toggle Logic ]]
 closeBtn.MouseButton1Click:Connect(function()
 	frame.Visible = false
 	toggleBtn.Visible = true
@@ -60,32 +61,31 @@ toggleBtn.MouseButton1Click:Connect(function()
 	toggleBtn.Visible = false
 end)
 
--- [[ TAB SETUP ]]
+-- [[ TAB SYSTEM ]]
 local tabs = { "Main", "Fun", "Misc" }
 local pages = {}
 local currentTab = "Main"
 
-for i, name in pairs(tabs) do
-	local btn = Instance.new("TextButton", frame)
-	btn.Size = UDim2.new(0, 70, 0, 25)
-	btn.Position = UDim2.new(0, 5 + (i - 1) * 75, 0, 35)
-	btn.Text = name
-	btn.Font = Enum.Font.SourceSansBold
-	btn.TextSize = 16
-	btn.TextColor3 = Color3.new(1,1,1)
-	btn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
-	btn.BorderColor3 = Color3.fromRGB(0, 162, 255)
+for i, name in ipairs(tabs) do
+	local tabBtn = Instance.new("TextButton", frame)
+	tabBtn.Size = UDim2.new(0, 70, 0, 25)
+	tabBtn.Position = UDim2.new(0, 5 + (i - 1) * 75, 0, 35)
+	tabBtn.Text = name
+	tabBtn.Font = Enum.Font.SourceSansBold
+	tabBtn.TextSize = 16
+	tabBtn.TextColor3 = Color3.new(1, 1, 1)
+	tabBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+	tabBtn.BorderColor3 = Color3.fromRGB(0, 162, 255)
 
-	btn.MouseButton1Click:Connect(function()
+	tabBtn.MouseButton1Click:Connect(function()
 		currentTab = name
-		for tabName, tabFrame in pairs(pages) do
-			tabFrame.Visible = (tabName == name)
+		for tabName, page in pairs(pages) do
+			page.Visible = (tabName == name)
 		end
 	end)
 end
 
--- [[ PAGES SETUP ]]
-for _, name in pairs(tabs) do
+for _, name in ipairs(tabs) do
 	local page = Instance.new("Frame", frame)
 	page.Name = name
 	page.Size = UDim2.new(1, -10, 1, -80)
@@ -95,7 +95,7 @@ for _, name in pairs(tabs) do
 	pages[name] = page
 end
 
--- [[ BUTTON FUNCTION TEMPLATE ]]
+-- [[ BUTTON GENERATOR ]]
 local function createButton(parent, label, callback, row, col)
 	local btn = Instance.new("TextButton", parent)
 	btn.Size = UDim2.new(0, 100, 0, 30)
@@ -103,7 +103,7 @@ local function createButton(parent, label, callback, row, col)
 	btn.Text = label
 	btn.Font = Enum.Font.SourceSans
 	btn.TextSize = 18
-	btn.TextColor3 = Color3.new(1,1,1)
+	btn.TextColor3 = Color3.new(1, 1, 1)
 	btn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
 	btn.BorderColor3 = Color3.fromRGB(0, 162, 255)
 	btn.MouseButton1Click:Connect(callback)
@@ -112,68 +112,70 @@ end
 -- [[ MAIN TAB BUTTONS ]]
 createButton(pages["Main"], "Faster walkSpeed", function()
 	local character = player.Character or player.CharacterAdded:Wait()
-			local humanoid = character:FindFirstChildOfClass("Humanoid")
-			if humanoid then
-				humanoid.WalkSpeed = 32
-			end
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.WalkSpeed = 32
+	end
 end, 1, 1)
 
-createButton(pages["Main"], "Weird esp", function()
+createButton(pages["Main"], "Weird ESP", function()
 	for _, plr in pairs(Players:GetPlayers()) do
-				if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-					local root = plr.Character.HumanoidRootPart
-					local billboard = Instance.new("BillboardGui")
-					billboard.Name = "CornerESP"
-					billboard.Adornee = root
-					billboard.Size = UDim2.new(0, 100, 0, 100)
-					billboard.AlwaysOnTop = true
-					billboard.Parent = root
+		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+			local root = plr.Character.HumanoidRootPart
+			if not root:FindFirstChild("CornerESP") then
+				local billboard = Instance.new("BillboardGui")
+				billboard.Name = "CornerESP"
+				billboard.Adornee = root
+				billboard.Size = UDim2.new(0, 100, 0, 100)
+				billboard.AlwaysOnTop = true
+				billboard.Parent = root
 
-					local function makeCorner(x, y)
-						local corner = Instance.new("Frame")
-						corner.Size = UDim2.new(0, 10, 0, 10)
-						corner.Position = UDim2.new(0, x, 0, y)
-						corner.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-						corner.BorderSizePixel = 0
-						corner.Parent = billboard
-					end
-
-					makeCorner(0, 0)
-					makeCorner(90, 0)
-					makeCorner(0, 90)
-					makeCorner(90, 90)
+				for _, pos in ipairs({{0,0},{90,0},{0,90},{90,90}}) do
+					local corner = Instance.new("Frame")
+					corner.Size = UDim2.new(0, 10, 0, 10)
+					corner.Position = UDim2.new(0, pos[1], 0, pos[2])
+					corner.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+					corner.BorderSizePixel = 0
+					corner.Parent = billboard
 				end
 			end
+		end
+	end
 end, 1, 2)
 
 createButton(pages["Main"], "Inf Jump", function()
 	local UIS = game:GetService("UserInputService")
-			_G.infiniteJump = true
-			UIS.JumpRequest:Connect(function()
-				if _G.infiniteJump then
-					player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-				end
-			end)
+	_G.infiniteJump = true
+	UIS.JumpRequest:Connect(function()
+		if _G.infiniteJump and player.Character then
+			local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+		end
+	end)
 end, 2, 1)
 
 createButton(pages["Main"], "Kill All [FE]", function()
-	-- Example of exploiting a RemoteEvent
-for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-    if player ~= game.Players.LocalPlayer then
-        -- Replace 'KillRemote' with the actual RemoteEvent used by the game
-        game:GetService("ReplicatedStorage").KillRemote:FireServer(player)
-    end
-end
-
+	local remote = game:GetService("ReplicatedStorage"):FindFirstChild("KillRemote")
+	if remote then
+		for _, plr in pairs(Players:GetPlayers()) do
+			if plr ~= player then
+				remote:FireServer(plr)
+			end
+		end
+	else
+		warn("KillRemote not found in ReplicatedStorage.")
+	end
 end, 2, 2)
 
 -- [[ FUN TAB BUTTONS ]]
 createButton(pages["Fun"], "Spin", function()
-	print("Spin fun!")
+	print("Spin effect here.")
 end, 1, 1)
 
 createButton(pages["Fun"], "Rainbow", function()
-	print("Rainbow effect here.")
+	print("Rainbow effect placeholder.")
 end, 1, 2)
 
 -- [[ MISC TAB BUTTONS ]]
@@ -182,7 +184,7 @@ createButton(pages["Misc"], "ESP", function()
 end, 1, 1)
 
 createButton(pages["Misc"], "Anti-AFK", function()
-	print("Anti-AFK script.")
+	print("Anti-AFK enabled.")
 end, 1, 2)
 
 -- [[ FPS COUNTER ]]
@@ -199,13 +201,13 @@ fpsLabel.Text = "FPS: ..."
 fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 local RS = game:GetService("RunService")
-local last = tick()
+local lastTick = tick()
 local frames = 0
 RS.RenderStepped:Connect(function()
 	frames += 1
-	if tick() - last >= 1 then
+	if tick() - lastTick >= 1 then
 		fpsLabel.Text = "FPS: " .. frames
 		frames = 0
-		last = tick()
+		lastTick = tick()
 	end
 end)
