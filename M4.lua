@@ -1,102 +1,125 @@
---// GUI Setup and Password Prompt //--
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-screenGui.Name = "FakeCoolkiddGUI"
-screenGui.ResetOnSpawn = false
+-- // M4 GUI v1 - c00lkidd inspired, with tabs, FPS, toggle, and organized structure
 
-local password = "letmein"
-local passwordFrame = Instance.new("Frame", screenGui)
-passwordFrame.Size = UDim2.new(0.8, 0, 0.3, 0)
-passwordFrame.Position = UDim2.new(0.1, 0, 0.35, 0)
-passwordFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-passwordFrame.BorderSizePixel = 0
+-- [[ MAIN GUI SETUP ]]
+local plr = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", plr:WaitForChild("PlayerGui"))
+gui.Name = "M4_GUI"
+gui.ResetOnSpawn = false
 
-local pwLabel = Instance.new("TextLabel", passwordFrame)
-pwLabel.Size = UDim2.new(1, 0, 0.4, 0)
-pwLabel.Text = "Enter Password"
-pwLabel.TextScaled = true
-pwLabel.TextColor3 = Color3.fromRGB(255,255,255)
-pwLabel.BackgroundTransparency = 1
+-- [[ FRAME SETUP ]]
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 240, 0, 280)
+frame.Position = UDim2.new(0.5, -120, 0.5, -140)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BorderColor3 = Color3.fromRGB(0, 162, 255)
+frame.BorderSizePixel = 2
+frame.Active = true
+frame.Draggable = true
+frame.Visible = true
 
-local pwBox = Instance.new("TextBox", passwordFrame)
-pwBox.Size = UDim2.new(0.9, 0, 0.3, 0)
-pwBox.Position = UDim2.new(0.05, 0, 0.45, 0)
-pwBox.PlaceholderText = "Password..."
-pwBox.TextScaled = true
-pwBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-pwBox.TextColor3 = Color3.new(1,1,1)
+-- [[ TITLE BAR ]]
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -50, 0, 30)
+title.Position = UDim2.new(0, 5, 0, 0)
+title.Text = "M4 GUI"
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(0, 162, 255)
+title.BackgroundTransparency = 1
 
-local submit = Instance.new("TextButton", passwordFrame)
-submit.Size = UDim2.new(0.5, 0, 0.2, 0)
-submit.Position = UDim2.new(0.25, 0, 0.8, 0)
-submit.Text = "Enter"
-submit.TextScaled = true
-submit.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+-- [[ CLOSE BUTTON ]]
+local closeBtn = Instance.new("TextButton", frame)
+closeBtn.Size = UDim2.new(0, 40, 0, 25)
+closeBtn.Position = UDim2.new(1, -45, 0, 3)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+closeBtn.BorderColor3 = Color3.fromRGB(0, 162, 255)
 
-submit.MouseButton1Click:Connect(function()
-	if pwBox.Text == password then
-		passwordFrame.Visible = false
-	else
-		pwBox.Text = "Wrong!"
-	end
+-- [[ TOGGLE BUTTON (BOTTOM RIGHT) ]]
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.new(0, 80, 0, 30)
+toggleBtn.Position = UDim2.new(1, -90, 1, -40)
+toggleBtn.Text = "Open M4"
+toggleBtn.Font = Enum.Font.SourceSansBold
+toggleBtn.TextSize = 16
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+toggleBtn.BorderColor3 = Color3.fromRGB(0, 162, 255)
+
+-- Close / Open Logic
+closeBtn.MouseButton1Click:Connect(function()
+	frame.Visible = false
+	toggleBtn.Visible = true
 end)
 
---// Page & Button Setup //--
-local currentPage = 1
-local totalPages = 3
+toggleBtn.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	toggleBtn.Visible = false
+end)
+
+-- [[ TAB SETUP ]]
+local tabs = { "Main", "Fun", "Misc" }
 local pages = {}
+local currentTab = "Main"
 
-local function createPage(name, index)
-	local page = Instance.new("Frame", screenGui)
+for i, name in pairs(tabs) do
+	local btn = Instance.new("TextButton", frame)
+	btn.Size = UDim2.new(0, 70, 0, 25)
+	btn.Position = UDim2.new(0, 5 + (i - 1) * 75, 0, 35)
+	btn.Text = name
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 16
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+	btn.BorderColor3 = Color3.fromRGB(0, 162, 255)
+
+	btn.MouseButton1Click:Connect(function()
+		currentTab = name
+		for tabName, tabFrame in pairs(pages) do
+			tabFrame.Visible = (tabName == name)
+		end
+	end)
+end
+
+-- [[ PAGES SETUP ]]
+for _, name in pairs(tabs) do
+	local page = Instance.new("Frame", frame)
 	page.Name = name
-	page.Size = UDim2.new(1, 0, 1, 0)
-	page.Position = UDim2.new(0, 0, 0, 0)
+	page.Size = UDim2.new(1, -10, 1, -80)
+	page.Position = UDim2.new(0, 5, 0, 65)
 	page.BackgroundTransparency = 1
-	page.Visible = (index == 1)
+	page.Visible = (name == currentTab)
+	pages[name] = page
+end
 
-	local title = Instance.new("TextLabel", page)
-	title.Size = UDim2.new(1, 0, 0.1, 0)
-	title.Text = "M4 GUI - " .. name
-	title.TextColor3 = Color3.new(1,1,1)
-	title.TextScaled = true
-	title.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+-- [[ BUTTON FUNCTION TEMPLATE ]]
+local function createButton(parent, label, callback, row, col)
+	local btn = Instance.new("TextButton", parent)
+	btn.Size = UDim2.new(0, 100, 0, 30)
+	btn.Position = UDim2.new(0, (col - 1) * 110, 0, (row - 1) * 40)
+	btn.Text = label
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 18
+	btn.TextColor3 = Color3.new(1,1,1)
+	btn.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
+	btn.BorderColor3 = Color3.fromRGB(0, 162, 255)
+	btn.MouseButton1Click:Connect(callback)
+end
 
-	local category = Instance.new("TextLabel", page)
-	category.Size = UDim2.new(1, 0, 0.05, 0)
-	category.Position = UDim2.new(0, 0, 0.1, 0)
-	category.Text = "Category: " .. name
-	category.TextColor3 = Color3.new(1,1,1)
-	category.TextScaled = true
-	category.BackgroundColor3 = Color3.fromRGB(0, 0, 120)
-
-	local function createButton(buttonText, posY, scriptFunction)
-		local button = Instance.new("TextButton", page)
-		button.Size = UDim2.new(0.9, 0, 0.08, 0)
-		button.Position = UDim2.new(0.05, 0, posY, 0)
-		button.Text = buttonText
-		button.TextScaled = true
-		button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-		button.TextColor3 = Color3.new(1,1,1)
-
-		button.MouseButton1Click:Connect(function()
-			print("[" .. name .. "] Clicked: " .. buttonText)
-			scriptFunction()
-		end)
-	end
-
-	--// PAGE BUTTONS HERE --
-	if name == "Page1" then
-		createButton("Faster walkSpeed", 0.17, function()
-			local character = player.Character or player.CharacterAdded:Wait()
+-- [[ MAIN TAB BUTTONS ]]
+createButton(pages["Main"], "Faster walkSpeed", function()
+	local character = player.Character or player.CharacterAdded:Wait()
 			local humanoid = character:FindFirstChildOfClass("Humanoid")
 			if humanoid then
 				humanoid.WalkSpeed = 32
 			end
-		end)
+end, 1, 1)
 
-		createButton("Corners ESP", 0.27, function()
-			for _, plr in pairs(Players:GetPlayers()) do
+createButton(pages["Main"], "Weird esp", function()
+	for _, plr in pairs(Players:GetPlayers()) do
 				if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
 					local root = plr.Character.HumanoidRootPart
 					local billboard = Instance.new("BillboardGui")
@@ -121,191 +144,68 @@ local function createPage(name, index)
 					makeCorner(90, 90)
 				end
 			end
-		end)
+end, 1, 2)
 
-		createButton("Infinite Jump", 0.37, function()
-			local UIS = game:GetService("UserInputService")
+createButton(pages["Main"], "Inf Jump", function()
+	local UIS = game:GetService("UserInputService")
 			_G.infiniteJump = true
 			UIS.JumpRequest:Connect(function()
 				if _G.infiniteJump then
 					player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
 				end
 			end)
-		end)
+end, 2, 1)
 
-		createButton("Invis Tool", 0.47, function()
-	local Players = game:GetService("Players")
-	local player = Players.LocalPlayer
-	local character = player.Character or player.CharacterAdded:Wait()
-
-	-- Create Tool
-	local tool = Instance.new("Tool")
-	tool.RequiresHandle = false
-	tool.Name = "InvisToggleTool"
-
-	local invisible = false
-
-	-- Toggle invisibility function
-	local function toggleInvisibility()
-		invisible = not invisible
-		for _, part in pairs(character:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.LocalTransparencyModifier = invisible and 1 or 0
-				part.CanCollide = not invisible
-			elseif part:IsA("Decal") then
-				part.Transparency = invisible and 1 or 0
-			end
-		end
-	end
-
-	-- On activate (click)
-	tool.Activated:Connect(toggleInvisibility)
-
-	-- Give the tool to the player
-	tool.Parent = player.Backpack
-end)
-
-
-		createButton("Lock On", 0.57, function()
-	local Players = game:GetService("Players")
-	local LocalPlayer = Players.LocalPlayer
-	local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-	local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-	
-	local closestPlayer = nil
-	local shortestDistance = math.huge
-
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			local distance = (player.Character.HumanoidRootPart.Position - HumanoidRootPart.Position).magnitude
-			if distance < shortestDistance then
-				shortestDistance = distance
-				closestPlayer = player
-			end
-		end
-	end
-
-	if closestPlayer then
-		print("Locked on to:", closestPlayer.Name)
-		-- Optional: highlight or follow
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "LockOnHighlight"
-		highlight.FillColor = Color3.fromRGB(255, 0, 0)
-		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-		highlight.Adornee = closestPlayer.Character
-		highlight.Parent = closestPlayer.Character
-	end
-end)
-
-
-	elseif name == "Page2" then
-		createButton("Bigger Hitbox", 0.17, function()
-	for _, player in pairs(game.Players:GetPlayers()) do
-		if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			local hrp = player.Character.HumanoidRootPart
-			hrp.Size = Vector3.new(50, 50, 50) -- MASSIVE hitbox
-			hrp.Transparency = 0.7
-			hrp.CanCollide = false
-			hrp.Massless = true
-
-			if not hrp:FindFirstChild("HitboxBox") then
-				local box = Instance.new("BoxHandleAdornment")
-				box.Name = "HitboxBox"
-				box.Size = hrp.Size
-				box.Color3 = Color3.fromRGB(0, 170, 255)
-				box.Transparency = 0.5
-				box.AlwaysOnTop = true
-				box.ZIndex = 5
-				box.Adornee = hrp
-				box.Parent = hrp
-			end
-		end
-	end
-end)
-
-
-		createButton("Rainbow Character", 0.27, function()
-			-- 🔧 INSERT rainbow effect script
-		end)
-
-		createButton("Invisible Character", 0.37, function()
-			-- 🔧 INSERT invisibility toggle here
-		end)
-
-		createButton("Anti-Chat Logger", 0.47, function()
-			-- 🔧 INSERT anti-logger script
-		end)
-
-		createButton("Click TP Tool", 0.57, function()
-			-- 🔧 INSERT teleport tool script
-		end)
-
-	elseif name == "Page3" then
-		createButton("FE Kill All (R6 only)", 0.17, function()
-			-- 🔧 INSERT kill all script
-		end)
-
-		createButton("Play Sound for All", 0.27, function()
-			-- 🔧 INSERT sound broadcaster script
-		end)
-
-		createButton("Loop Message Chat", 0.37, function()
-			-- 🔧 INSERT loop message function
-		end)
-
-		createButton("Crash Server (⚠️)", 0.47, function()
-			-- 🔧 INSERT crash logic (if permitted)
-		end)
-
-		createButton("Reset Character", 0.57, function()
-			player:LoadCharacter()
-		end)
-	end
-
-	return page
+createButton(pages["Main"], "Kill All [FE]", function()
+	-- Example of exploiting a RemoteEvent
+for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        -- Replace 'KillRemote' with the actual RemoteEvent used by the game
+        game:GetService("ReplicatedStorage").KillRemote:FireServer(player)
+    end
 end
 
---// Generate Pages --//
-for i = 1, totalPages do
-	pages[i] = createPage("Page" .. i, i)
-end
+end, 2, 2)
 
---// Navigation Buttons --//
-local navFrame = Instance.new("Frame", screenGui)
-navFrame.Size = UDim2.new(1, 0, 0.07, 0)
-navFrame.Position = UDim2.new(0, 0, 0.93, 0)
-navFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+-- [[ FUN TAB BUTTONS ]]
+createButton(pages["Fun"], "Spin", function()
+	print("Spin fun!")
+end, 1, 1)
 
-local leftBtn = Instance.new("TextButton", navFrame)
-leftBtn.Size = UDim2.new(0.2, 0, 1, 0)
-leftBtn.Position = UDim2.new(0.15, 0, 0, 0)
-leftBtn.Text = "<"
-leftBtn.TextScaled = true
-leftBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-leftBtn.TextColor3 = Color3.new(1,1,1)
+createButton(pages["Fun"], "Rainbow", function()
+	print("Rainbow effect here.")
+end, 1, 2)
 
-local rightBtn = Instance.new("TextButton", navFrame)
-rightBtn.Size = UDim2.new(0.2, 0, 1, 0)
-rightBtn.Position = UDim2.new(0.65, 0, 0, 0)
-rightBtn.Text = ">"
-rightBtn.TextScaled = true
-rightBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-rightBtn.TextColor3 = Color3.new(1,1,1)
+-- [[ MISC TAB BUTTONS ]]
+createButton(pages["Misc"], "ESP", function()
+	print("ESP activated.")
+end, 1, 1)
 
-local function showPage(index)
-	for i, page in ipairs(pages) do
-		page.Visible = (i == index)
+createButton(pages["Misc"], "Anti-AFK", function()
+	print("Anti-AFK script.")
+end, 1, 2)
+
+-- [[ FPS COUNTER ]]
+local fpsLabel = Instance.new("TextLabel", gui)
+fpsLabel.Size = UDim2.new(0, 80, 0, 25)
+fpsLabel.Position = UDim2.new(1, -85, 0, 10)
+fpsLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+fpsLabel.BorderColor3 = Color3.fromRGB(0, 162, 255)
+fpsLabel.BorderSizePixel = 2
+fpsLabel.TextColor3 = Color3.new(1, 1, 1)
+fpsLabel.Font = Enum.Font.SourceSansBold
+fpsLabel.TextSize = 16
+fpsLabel.Text = "FPS: ..."
+fpsLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local RS = game:GetService("RunService")
+local last = tick()
+local frames = 0
+RS.RenderStepped:Connect(function()
+	frames += 1
+	if tick() - last >= 1 then
+		fpsLabel.Text = "FPS: " .. frames
+		frames = 0
+		last = tick()
 	end
-end
-
-leftBtn.MouseButton1Click:Connect(function()
-	currentPage = currentPage - 1
-	if currentPage < 1 then currentPage = totalPages end
-	showPage(currentPage)
-end)
-
-rightBtn.MouseButton1Click:Connect(function()
-	currentPage = currentPage + 1
-	if currentPage > totalPages then currentPage = 1 end
-	showPage(currentPage)
 end)
